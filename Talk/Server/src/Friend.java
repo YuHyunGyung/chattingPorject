@@ -15,8 +15,6 @@ public class Friend extends JPanel{
 	public String UserName;
 	public String UserStatusMsg;
 	
-	
-	
 	public Friend(ImageIcon userimg, String username, String statemsg) {
 		UserImg = userimg;
 		UserName = username;

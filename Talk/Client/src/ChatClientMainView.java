@@ -45,8 +45,6 @@ public class ChatClientMainView extends JFrame{
 	
 	JScrollPane friendScroll;
 	public Vector<Friend> FriendVector = new Vector<Friend>();
-	public JList<Friend> friendList;
-	public DefaultListModel<Friend> friendListModel = new DefaultListModel<Friend>();
 	
 	
 	public JScrollPane scrollPaneFriendList;
@@ -166,7 +164,7 @@ public class ChatClientMainView extends JFrame{
 		
 		scrollPaneChatList = new JScrollPane();
 		scrollPaneChatList.setLayout(null);
-		//scrollPaneChatList.setViewportBorder(null);
+		scrollPaneChatList.setViewportBorder(null);
 		scrollPaneChatList.setBounds(0, 62, 312, 541);
 		chatPanel.add(scrollPaneChatList);
 		
@@ -174,7 +172,7 @@ public class ChatClientMainView extends JFrame{
 		textPaneChatList.setEditable(false);
 		scrollPaneChatList.setViewportView(textPaneChatList);
 		textPaneChatList.setBounds(0, 0, 312, 602);
-		//scrollPaneChatList.add(textPaneChatList);
+		scrollPaneChatList.add(textPaneChatList);
 		
 		chatPanelHeader = new JPanel();
 		chatPanelHeader.setBackground(new Color(255, 255, 255));
@@ -185,6 +183,13 @@ public class ChatClientMainView extends JFrame{
 		ImageIcon img3 = new ImageIcon(ChatClientMainView.class.getResource("./img/chatPlus.png"));
 		img3 = imageSetSize(img3, 50, 50);
 		addChatRoomBtn = new JButton(img3);
+		addChatRoomBtn.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				ChatClientSelectFriendDialog dialog = new ChatClientSelectFriendDialog(mainView);
+				dialog.setVisible(true);
+			}
+			
+		});
 		addChatRoomBtn.setBounds(250, 5, 50, 50);
 		addChatRoomBtn.setBorderPainted(false);
 		addChatRoomBtn.setContentAreaFilled(false);
@@ -210,8 +215,12 @@ public class ChatClientMainView extends JFrame{
 			chatPanel.setVisible(false);
 			friendPanel.setVisible(true);
 			
-			//AddFriend(profile, username, "한성대학교 컴퓨터공학부");
-			ChatMsg obcm = new ChatMsg(username, "100", "Hansung University");
+			AddFriend(profile, username, "O", "한성대학교 컴퓨터공학부");
+			UserIcon = profile;
+			
+			ChatMsg obcm = new ChatMsg(username, "100", "Login");
+			obcm.UserStatus = "O";
+			obcm.img = profile;
 			SendObject(obcm);
 			
 			ListenNetwork net = new ListenNetwork();
@@ -248,10 +257,6 @@ public class ChatClientMainView extends JFrame{
 					case "100":
 						LoginNewFriend(cm);
 						break;
-					case "110":
-						UserList(cm);
-						System.out.println("리스트 : " + cm.data);
-						break;
 					case "200": // chat message
 						
 						//LoginNewFriend(cm);
@@ -260,6 +265,12 @@ public class ChatClientMainView extends JFrame{
 						//AppendText("[" + cm.getId() + "]");
 						//AppendImage(cm.img);
 						break;
+					case "500":
+						break;
+					case "510":
+						AddChatRoom(cm);
+						break;
+						
 					}
 				} catch (IOException e) {
 					System.out.println(e + "	ois.readObject() error");
@@ -300,7 +311,7 @@ public class ChatClientMainView extends JFrame{
 			
 			}
 		}
-		AddFriend(cm.img, cm.UserName, cm.data);
+		AddFriend(cm.img, cm.UserName, "0",cm.UserStatusMsg);
 	}
 	
 	public void LogoutFriend(ChatMsg cm) {
@@ -321,47 +332,25 @@ public class ChatClientMainView extends JFrame{
 		}
 	}
 	
-	public void AddFriend(ImageIcon icon, String username, String statusmsg) { // on off 표시시 String userstatus 추가 
+	public void AddFriend(ImageIcon icon, String username, String userstatus, String statusmsg) { // on off 표시시 String userstatus 추가 
 		int len = textPaneFriendList.getDocument().getLength();
 		textPaneFriendList.setCaretPosition(len);
-		Friend f = new Friend(mainView, icon, username, statusmsg);
-		f.UserStatusMsg = statusmsg;
-		FriendVector.add(f);
+		Friend f = new Friend(mainView, icon, username, userstatus, statusmsg);
+		f.UserStatusMsg = userstatus;
 		textPaneFriendList.insertComponent(f);
-		/*
-		if(username.equals(UserName)) {
-			f.setBackground(new Color(240, 240, 240));
-			// f.SetProfileButtonActive(); // 본인의 Profile 사진은 변경할 수 있다.
-			f.SetStatusChangeActive();
-		}
-		f.SetProfileButtonActive(); // 프사 변경, 프사 확인 버튼 활성화 
-		//f.SetSelectable(false); // check box는 diable 시켜서 상태 확인용으로만 사용된다.
-		//FriendVector.add(f);
-		
-		
-		*/
+		FriendVector.add(f);
 		textPaneFriendList.setCaretPosition(0);
 		repaint();
 		
 	}
 	
-	public void UserList(ChatMsg cm) {
-		String[] users = cm.data.split(" ");
-		if(users.length > 1 && FriendVector.size() > 1) {
-			for(int i = 0; i < users.length-1; i++) {
-				for(int j = 0; j < FriendVector.size(); i++) {
-					if(!users[i].equals(FriendVector.get(j).UserName)) {
-						AddFriend(profile, users[i], "Hansung University");
-					//friendListModel.in
-					//friendList.setModel(friendListModel);
-					//scrollPaneFriendList.repaint();
-					}
-				}
-				
-			}
+	public Friend SearchFriend(String name) {
+		for(Friend f : FriendVector) {
+			if(f.UserName.equals(name))
+				return f;
 		}
-		//repaint();
-		//System.out.println("사용자 목록 " + cm.data);
+		
+		return null;
 	}
 	
 	
@@ -372,11 +361,10 @@ public class ChatClientMainView extends JFrame{
 	public void AddChatRoom(ChatMsg cm) {
 		int len = textPaneChatList.getDocument().getLength();
 		textPaneChatList.setCaretPosition(len);
-		ChatRoom r = new ChatRoom(mainView, UserName, cm.roomId, cm.userlist);
-		//r.setAlignmentY(len);
-		scrollPaneChatList.add(r);
-		//textPaneChatList.insertComponent(r);
-		//textPaneChatList.
+		
+		ChatRoom r = new ChatRoom(mainView, cm.data, "새로운 채팅방이 생성되었습니다.");
+		r.userlist = cm.userlist;
+		textPaneChatList.insertComponent(r);
 		ChatRoomVector.add(r);
 		textPaneChatList.setCaretPosition(0);
 		repaint();

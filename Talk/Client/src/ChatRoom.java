@@ -7,6 +7,8 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.Color;
+import java.awt.Dimension;
+
 import javax.swing.UIManager;
 
 public class ChatRoom extends JPanel{
@@ -19,14 +21,15 @@ public class ChatRoom extends JPanel{
 	//String UserStatusMsg;
 	
 	
-	public ChatRoom(ChatClientMainView mainView, String username, String roomId, String userlist) {
+	public ChatRoom(ChatClientMainView mainView, String roomId, String chatmsg) {
 		//setBorder(null);	
 		this.mainView = mainView;
-		UserName = username;
+		//UserName = username;
 		this.roomId = roomId;
-		this.userlist = userlist;
+		//this.userlist = userlist;
 		
-		setBackground(new Color(0, 252, 255));
+		setPreferredSize(new Dimension(312, 60));
+		setBackground(new Color(255, 255, 255));
 		setBounds(0, 0, 200, 60);
 		setLayout(null);
 		
@@ -41,18 +44,18 @@ public class ChatRoom extends JPanel{
 		
 		JLabel roomid = new JLabel(roomId);
 		roomid.setBackground(new Color(255, 38, 0));
-		roomid.setBounds(60, 7, 95, 20);
+		roomid.setBounds(60, 7, 220, 20);
 		roomid.setFont(new Font("Lucida Grande", Font.PLAIN, 15));
 		add(roomid);
 		
-		JLabel chatMsg = new JLabel("새로운 채팅");
-		chatMsg.setBounds(60, 33, 85, 15);
+		JLabel chatMsg = new JLabel(chatmsg);
+		chatMsg.setBounds(60, 33, 231, 15);
 		add(chatMsg);
 		
 		JLabel lblNewLabel = new JLabel();
 		add(lblNewLabel);
 		
-		mainView.textPaneChatList.insertComponent(this);
+		//mainView.textPaneChatList.insertComponent(this);
 		
 	}
 }

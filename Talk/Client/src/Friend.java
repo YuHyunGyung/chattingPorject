@@ -18,10 +18,9 @@ public class Friend extends JPanel{
 	
 	
 	
-	public Friend(ChatClientMainView mainView, ImageIcon userimg, String username, String statemsg) {
+	public Friend(ChatClientMainView mainView, ImageIcon userimg, String username, String userstatus, String statemsg) {
 		UserImg = userimg;
 		UserName = username;
-		UserStatusMsg = statemsg;
 		
 		setPreferredSize(new Dimension(312, 60));
 		setLayout(null);

@@ -123,17 +123,9 @@ public class TalkServer extends JFrame {
 					AppendText("새로운 참가자 from " + client_socket);
 					// User 당 하나씩 Thread 생성
 					UserService new_user = new UserService(client_socket);
-					/*
-					for(int i = 0; i < UserVec.size(); i++) {
-						if(UserVec.get(i).equals(new_user))
-					}
-					*/
 					UserVec.add(new_user); // 새로운 참가자 배열에 추가
 					new_user.start(); // 만든 객체의 스레드 실행
-					//FriendList.add()
 					AppendText("현재 참가자 수 " + UserVec.size());
-					
-					
 				} catch (IOException e) {
 					AppendText("accept() error");
 					// System.exit(0);
@@ -199,12 +191,32 @@ public class TalkServer extends JFrame {
 			Friend f = new Friend(cm.img, cm.UserName, cm.data);
 			FriendVector.add(f);
 			String list = "";
-			for(int i = 0; i < Friend.size(); i++) {
-				AppendText(Friend.get(i).toString());
-				list += Friend.get(i).toString() + " ";
-			}
 			WriteAllObject(new ChatMsg(cm.UserName, cm.code, cm.data));
-			WriteAllObject(new ChatMsg(cm.UserName, "110", list));
+			for(int i = 0; i < FriendVector.size(); i++) {
+				AppendText("친구 Vector : " + FriendVector.get(i).UserName);
+				for (int j = 0; j < user_vc.size(); j++) {
+					UserService user = (UserService) user_vc.elementAt(j);
+					if (user.UserName != FriendVector.get(i).UserName) {
+						user.WriteOneObject(new ChatMsg(FriendVector.get(i).UserName, "100", FriendVector.get(j).UserStatusMsg));
+						System.out.println("사용자 목록 : " + FriendVector.get(i).UserName);
+					}
+				}
+				/*
+				if(i != Friend.size())
+					list += Friend.get(i).toString() + " ";
+				
+				
+				if(!Friend.get(i).equals(cm.UserName)) {
+					WriteAllObject(new ChatMsg(Friend.get(i).toString, "100", cm.data));
+				}
+				*/
+				
+			}
+			
+			cm.userlist = list;
+			
+			//WriteAllObject(new ChatMsg(cm.UserName, cm.code, list));
+			//WriteAllObject(new ChatMsg(cm.UserName, "110", list));
 			AppendText("List : " + list);
 			//WriteAllObject(new ChatMsg(cm.UserName, cm.code, cm.data));
 			//System.out.println(UserVec.size());
@@ -214,6 +226,10 @@ public class TalkServer extends JFrame {
 			String msg = "[" + UserName + "]님이 퇴장 하였습니다.\n";
 			UserVec.removeElement(this); // Logout한 현재 객체를 벡터에서 지운다
 			Friend.removeElement(UserName);
+			for(int i = 0; i < FriendVector.size(); i++) {
+				if(FriendVector.get(i).UserName.equals(UserName))
+					FriendVector.remove(i);
+			}
 			String list = "";
 			for(int i = 0; i < Friend.size(); i++) {
 				AppendText(Friend.get(i).toString());
@@ -406,7 +422,22 @@ public class TalkServer extends JFrame {
 					} else if (cm.code.matches("300")) {
 						WriteAllObject(cm);
 						
-					} else if(cm.code.matches("800")) {
+					 } else if (cm.code.matches("500")) {
+						 AppendText("채팅방이름 : " + cm.data);
+						 String [] list = cm.data.split(" ");
+						 for (int j = 0; j < user_vc.size(); j++) {
+							UserService user = (UserService) user_vc.elementAt(j);
+							for(int i = 0; i < list.length; i++)
+								if (list[i].equals(user.UserName)) {
+									user.WriteOneObject(new ChatMsg(list[i], "510", cm.data));
+								}
+						}
+					} else if (cm.code.matches("510")) {
+						//WriteAllObject(cm);
+						
+					}
+					
+					else if(cm.code.matches("800")) {
 						
 					}
 				} catch (IOException e) {

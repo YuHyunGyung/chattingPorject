@@ -13,9 +13,10 @@ class ChatMsg implements Serializable {
 	public ImageIcon img = new ImageIcon(ChatClientMainView.class.getResource("./img/standardProfile.png"));;
 	public String time;
 	public Date date;
-	public String roomId = "1234";
-	public String userlist = "1234";
+	public String roomId;
+	public String userlist;
 	public String UserStatusMsg;
+	public String UserStatus;
 	
 	public ChatMsg(String UserName, String code, String msg) {
 		this.UserName = UserName;
