@@ -158,15 +158,6 @@ public class ChatClientMainView extends JFrame{
 		friendLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 28));
 		friendHeader.add(friendLabel);
 		
-		/*
-		friendList = new JList<Friend>(FriendVector);
-		friendList.setEnabled(false);
-		//friendList.setListData(FriendVector);
-		friendList.setBounds(0, 0, 312, 539);
-		scrollPaneFriendList.setViewportView(friendList);
-		scrollPaneFriendList.add(friendList);
-		*/
-		
 		chatPanel = new JPanel();
 		chatPanel.setVisible(false);
 		chatPanel.setBounds(82, 0, 312, 602);
@@ -336,23 +327,6 @@ public class ChatClientMainView extends JFrame{
 		Friend f = new Friend(mainView, icon, username, statusmsg);
 		f.UserStatusMsg = statusmsg;
 		FriendVector.add(f);
-		//friendList.add(f);
-		//friendListModel.add
-		textPaneFriendList.add(f);
-		//friendList = new JList<Friend>(FriendVector);
-		//scrollPaneFriendList.add(friendList);
-		//repaint();
-		/*
-		int i = 0;
-		for(Friend friend : FriendVector) {
-			friendList.add(friend, i++);
-			repaint();
-		}
-		*/
-		//friendList.setListData(FriendVector);
-		//scrollPaneFriendList.add(f);
-		
-		
 		textPaneFriendList.insertComponent(f);
 		/*
 		if(username.equals(UserName)) {
@@ -363,27 +337,27 @@ public class ChatClientMainView extends JFrame{
 		f.SetProfileButtonActive(); // 프사 변경, 프사 확인 버튼 활성화 
 		//f.SetSelectable(false); // check box는 diable 시켜서 상태 확인용으로만 사용된다.
 		//FriendVector.add(f);
-		//textPaneFriendList.setCaretPosition(0)
+		
 		
 		*/
+		textPaneFriendList.setCaretPosition(0);
 		repaint();
 		
 	}
 	
 	public void UserList(ChatMsg cm) {
 		String[] users = cm.data.split(" ");
-		for(int i = 0; i < users.length; i++) {
-			if(!users[i].equals(UserName)) {
-				System.out.println("사용자 " + users[i]);
-			//Friend f = new Friend(mainView, profile, users[i], cm.data);
-				AddFriend(profile, users[i], "hansung university");
-			//FriendVector.add(f);
-			//friendList.add(f);
-			
-			repaint();
-			//friendListModel.in
-			//friendList.setModel(friendListModel);
-			//scrollPaneFriendList.repaint();
+		if(users.length > 1 && FriendVector.size() > 1) {
+			for(int i = 0; i < users.length-1; i++) {
+				for(int j = 0; j < FriendVector.size(); i++) {
+					if(!users[i].equals(FriendVector.get(j).UserName)) {
+						AddFriend(profile, users[i], "Hansung University");
+					//friendListModel.in
+					//friendList.setModel(friendListModel);
+					//scrollPaneFriendList.repaint();
+					}
+				}
+				
 			}
 		}
 		//repaint();

@@ -1,5 +1,6 @@
 import javax.swing.JPanel;
 
+import java.awt.Dimension;
 import java.awt.Image;
 
 import javax.swing.ImageIcon;
@@ -22,7 +23,7 @@ public class Friend extends JPanel{
 		UserName = username;
 		UserStatusMsg = statemsg;
 		
-		setBounds(0, 0, 312, 60);
+		setPreferredSize(new Dimension(312, 60));
 		setLayout(null);
 		setVisible(true);
 		
