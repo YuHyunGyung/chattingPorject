@@ -369,17 +369,7 @@ public class ChatClientMainView extends JFrame{
 		textPaneChatList.setCaretPosition(0);
 		repaint();
 	}
-	/*
-	public void AddChatList(ChatMsg cm) {
-		int len = friendListPanel.getDocument().getLength();
-		friendListPanel.setCaretPosition(len);
-		ChatRoom r = new ChatRoom(mainView, UserName, cm.roomId, cm.userlist);
-		//r.setOpaque(true);
-		//friendListPanel.insertComponent(r);
-		ChatRoomVector.add(r);
-		friendListPanel.setCaretPosition(len);
-	}
-	*/
+	
 	public ChatRoom SearchChatRoom(String roomId) {
 		for(ChatRoom r : ChatRoomVector) {
 			if(r.roomId.equals(roomId))
