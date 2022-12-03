@@ -4,6 +4,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.Color;
@@ -38,6 +39,7 @@ public class ChatRoom extends JPanel{
 		roomImg.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				System.out.println("채팅방 클릭 ");
+				ChatClientChatRoomView chatRoom = new ChatClientChatRoomView(mainView, mainView.UserName, roomId, roomId, mainView.ip_addr, mainView.port_no);
 			}
 		});
 		add(roomImg);
@@ -57,5 +59,12 @@ public class ChatRoom extends JPanel{
 		
 		//mainView.textPaneChatList.insertComponent(this);
 		
+	}
+	
+	public ImageIcon imageSetSize(ImageIcon icon, int i, int j) { // image Size Setting
+		Image ximg = icon.getImage();  //ImageIcon을 Image로 변환.
+		Image yimg = ximg.getScaledInstance(i, j, java.awt.Image.SCALE_SMOOTH);
+		ImageIcon xyimg = new ImageIcon(yimg); 
+		return xyimg;
 	}
 }

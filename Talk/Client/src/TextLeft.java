@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Image;
 
@@ -10,34 +11,30 @@ import javax.swing.JTextPane;
 import javax.swing.SpringLayout;
 
 public class TextLeft extends JPanel{
-	private final JTextPane textPane = new JTextPane();
+	
+	private static final long serialVersionUID = 1L;
+	
 	public JButton profile;
 	public JLabel time;
-	public ImageIcon profileImg = null;
+	public ImageIcon profileImg = new ImageIcon(FriendLabel.class.getResource("./img/standardProfile.png"));
 	
-	public TextLeft(String username, String chattime) {
+	public TextLeft(ChatClientMainView mainView, String username, String chattime) {
+		setPreferredSize(new Dimension(207, 63));
 		setBackground(new Color(147, 208, 250));
-		SpringLayout springLayout = new SpringLayout();
-		setLayout(springLayout);
+		setLayout(null);
 		
-		//profileImg = imageSetSize(img, 56, 56);
-		
+		profileImg = imageSetSize(profileImg, 56, 56);
 		profile = new JButton(profileImg);
-		springLayout.putConstraint(SpringLayout.NORTH, profile, 6, SpringLayout.NORTH, this);
-		springLayout.putConstraint(SpringLayout.WEST, profile, 6, SpringLayout.WEST, this);
-		springLayout.putConstraint(SpringLayout.SOUTH, profile, 51, SpringLayout.NORTH, this);
+		profile.setBounds(5, 5, 50, 50);
 		add(profile);
 		
 		JLabel name = new JLabel(username);
-		springLayout.putConstraint(SpringLayout.WEST, name, 62, SpringLayout.WEST, this);
-		springLayout.putConstraint(SpringLayout.EAST, profile, -6, SpringLayout.WEST, name);
+		name.setBounds(60, 5, 120, 30);
 		name.setFont(new Font("Lucida Grande", Font.PLAIN, 15));
-		springLayout.putConstraint(SpringLayout.NORTH, name, 10, SpringLayout.NORTH, this);
 		add(name);
 		
 		time = new JLabel(chattime);
-		springLayout.putConstraint(SpringLayout.NORTH, time, 6, SpringLayout.SOUTH, name);
-		springLayout.putConstraint(SpringLayout.WEST, time, 6, SpringLayout.EAST, profile);
+		time.setBounds(60, 35, 120, 20);
 		add(time);
 	}
 	

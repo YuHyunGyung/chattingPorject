@@ -60,7 +60,8 @@ public class ChatClientMainView extends JFrame{
 	private ObjectInputStream ois;
 	private ObjectOutputStream oos;
 	private JLabel chatLabel;
-	
+	public String ip_addr;
+	public String port_no;
 	
 	
 	
@@ -68,6 +69,8 @@ public class ChatClientMainView extends JFrame{
 	public ChatClientMainView(String username, String ip_addr, String port_no) {
 		this.mainView = this;
 		UserName = username;
+		this.ip_addr = ip_addr;
+		this.port_no = port_no;
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 394, 630);
