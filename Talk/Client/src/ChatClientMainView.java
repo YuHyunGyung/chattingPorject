@@ -1,21 +1,11 @@
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
+import java.util.*;
 import javax.swing.border.EmptyBorder;
-
-import javax.swing.JButton;
-import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
-import java.awt.Color;
-import java.awt.FlowLayout;
+
 
 import javax.swing.JTextPane;
 import java.awt.Panel;
@@ -28,7 +18,6 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 
 public class ChatClientMainView extends JFrame{
-	//ChatClientMainView mainView;
 	private static final long serialVersionUID = 1L;
 	public Vector<ChatRoom> ChatRoomVector = new Vector<ChatRoom>();
 	public String UserName;
@@ -38,14 +27,12 @@ public class ChatClientMainView extends JFrame{
 	
 	public JPanel contentPane;
 	public JPanel panel;
-	public JButton friendListBtn;
-	public JButton chatListBtn;
 	public JPanel friendPanel;
 	public JPanel chatPanel;
+	public JButton friendListBtn;
+	public JButton chatListBtn;
 	
-	JScrollPane friendScroll;
 	public Vector<Friend> FriendVector = new Vector<Friend>();
-	
 	
 	public JScrollPane scrollPaneFriendList;
 	public JScrollPane scrollPaneChatList;
@@ -63,7 +50,7 @@ public class ChatClientMainView extends JFrame{
 	public String ip_addr;
 	public String port_no;
 	
-	
+	boolean check = false;
 	
 	
 	public ChatClientMainView(String username, String ip_addr, String port_no) {
@@ -85,7 +72,7 @@ public class ChatClientMainView extends JFrame{
 		panel.setLayout(null);
 		contentPane.add(panel);
 		
-		ImageIcon img = new ImageIcon(ChatClientMainView.class.getResource("./img/msg.png"));
+		ImageIcon img = new ImageIcon(ChatClientMainView.class.getResource("./img/user.png"));
 		img = imageSetSize(img, 50, 50);
 		friendListBtn = new JButton("");
 		friendListBtn.setEnabled(false);
@@ -108,7 +95,7 @@ public class ChatClientMainView extends JFrame{
 		
 		ImageIcon img2 = new ImageIcon(ChatClientMainView.class.getResource("./img/msg.png"));
 		img2 = imageSetSize(img2, 50, 50);
-		chatListBtn = new JButton(img2);
+		chatListBtn = new JButton("");
 		chatListBtn.setEnabled(true);
 		chatListBtn.setBounds(15, 83, 50, 50);
 		//chatList.setBorder(null);
@@ -122,7 +109,7 @@ public class ChatClientMainView extends JFrame{
 			
 		});
 		chatListBtn.setBorder(null);
-		chatListBtn.setIcon(img);
+		chatListBtn.setIcon(img2);
 		chatListBtn.setBorderPainted(false);
 		chatListBtn.setContentAreaFilled(false);
 		chatListBtn.setOpaque(false);
@@ -222,8 +209,9 @@ public class ChatClientMainView extends JFrame{
 			UserIcon = profile;
 			
 			ChatMsg obcm = new ChatMsg(username, "100", "Login");
-			obcm.UserStatus = "O";
 			obcm.img = profile;
+			obcm.UserStatus = "O";
+			obcm.UserStatusMsg = "한성대학교 컴퓨터공학부";
 			SendObject(obcm);
 			
 			ListenNetwork net = new ListenNetwork();
@@ -257,29 +245,43 @@ public class ChatClientMainView extends JFrame{
 					} else
 						continue;
 					switch (cm.code) {
-					case "100":
+					case "100": //login
 						LoginNewFriend(cm);
 						break;
 					case "200": // chat message
-						
-						//LoginNewFriend(cm);
+						/*
+						if(check==true)
+							AppendTextR(msg);
+						else
+							//AppendText(msg);
+							AppendTextL(cm);
+						*/
 						break;
-					case "300": // Image 첨부
+					case "300": // Image, Icon 첨부
 						//AppendText("[" + cm.getId() + "]");
-						//AppendImage(cm.img);
+						/*
+						if(check==true)
+							AppendImageR(cm.img);
+						else
+							AppendImageL(cm.img);
+						*/
 						break;
 					case "500":
 						break;
-					case "510":
+					case "510": //채팅방 만들기
 						AddChatRoom(cm);
+						break;
+					case "600": //profile modified
+						System.out.println("Client Recieve Editor");
+						ChangeFriendProfile(cm);
 						break;
 						
 					}
 				} catch (IOException e) {
 					System.out.println(e + "	ois.readObject() error");
 					try {
-//							dos.close();
-//							dis.close();
+//						dos.close();
+//						dis.close();
 						ois.close();
 						oos.close();
 						socket.close();
@@ -314,7 +316,8 @@ public class ChatClientMainView extends JFrame{
 			
 			}
 		}
-		AddFriend(cm.img, cm.UserName, "0",cm.UserStatusMsg);
+		AddFriend(cm.img, cm.UserName, "O", cm.UserStatusMsg);
+		System.out.println("UserStatusMsg: "+cm.UserStatusMsg);
 	}
 	
 	public void LogoutFriend(ChatMsg cm) {
@@ -325,26 +328,30 @@ public class ChatClientMainView extends JFrame{
 		}
 	}
 	
+	//프로필 사진 변경
 	public void ChangeFriendProfile(ChatMsg cm) {
+		System.out.println("ChangenFriendProfile");
+		
 		UserIcon = cm.img;
 		for(Friend f : FriendVector) {
 			if(f.UserName.equals(cm.UserName)) {
-				//f.SetIcon(cm);
+				f.SetIcon(cm);
 			}
 			//
 		}
 	}
 	
+	//새로운 친구 추가될때
 	public void AddFriend(ImageIcon icon, String username, String userstatus, String statusmsg) { // on off 표시시 String userstatus 추가 
 		int len = textPaneFriendList.getDocument().getLength();
 		textPaneFriendList.setCaretPosition(len);
+		
 		Friend f = new Friend(mainView, icon, username, userstatus, statusmsg);
-		f.UserStatusMsg = userstatus;
+		//f.UserStatusMsg = statusmsg;		
 		textPaneFriendList.insertComponent(f);
 		FriendVector.add(f);
 		textPaneFriendList.setCaretPosition(0);
 		repaint();
-		
 	}
 	
 	public Friend SearchFriend(String name) {
@@ -352,7 +359,6 @@ public class ChatClientMainView extends JFrame{
 			if(f.UserName.equals(name))
 				return f;
 		}
-		
 		return null;
 	}
 	
@@ -381,6 +387,8 @@ public class ChatClientMainView extends JFrame{
 		return null;
 	}
 	
+
+	
 	public void SendObject(Object ob) { // 서버로 메세지를 보내는 메소드
 		try {
 			oos.writeObject(ob);
@@ -391,9 +399,9 @@ public class ChatClientMainView extends JFrame{
 	}
 	
 	public ImageIcon imageSetSize(ImageIcon icon, int i, int j) { // image Size Setting
-		Image ximg = icon.getImage();  //ImageIcon을 Image로 변환.
-		Image yimg = ximg.getScaledInstance(i, j, java.awt.Image.SCALE_SMOOTH);
-		ImageIcon xyimg = new ImageIcon(yimg); 
-		return xyimg;
+		Image ori_img = icon.getImage();  //ImageIcon을 Image로 변환.
+		Image new_img = ori_img.getScaledInstance(i, j, java.awt.Image.SCALE_SMOOTH);
+		ImageIcon new_icon = new ImageIcon(new_img); 
+		return new_icon;
 	}
 }

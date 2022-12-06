@@ -4,10 +4,10 @@ import javax.swing.ImageIcon;
 
 public class ProfileInfo implements Serializable{
 	private static final long serialVersionUID = 1L;
-	private String username; 
-	private ImageIcon profileImg = new ImageIcon(ProfileInfo.class.getResource("./img/standardProfile.png"));
-	private ImageIcon backgroundImg = new ImageIcon(ProfileInfo.class.getResource("./img/greyBack.jpeg"));
-	private String stateMsg;
+	public String username; 
+	public ImageIcon profileImg = new ImageIcon(ProfileInfo.class.getResource("./img/standardProfile.png"));
+	public ImageIcon backgroundImg = new ImageIcon(ProfileInfo.class.getResource("./img/greyBack.jpeg"));
+	public String stateMsg;
 	
 	public ProfileInfo(String username) {
 		this.username = username;

@@ -10,6 +10,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.io.DataInputStream;
@@ -42,9 +43,12 @@ public class TalkServer extends JFrame {
 	private static final int BUF_LEN = 128; // Windows 처럼 BUF_LEN 을 정의
 	
 	private Vector<ChatRoom> ChatRoomVector = new Vector();
-	public Vector<Friend> FriendVector = new Vector<Friend>();
-	public Vector<String> Friend = new Vector<String>();
+//	public Vector<Friend> FriendVector = new Vector<Friend>();
+//	public Vector<String> Friend = new Vector<String>();
 	
+	public Vector<LoggedUser> FriendVector = new Vector<LoggedUser>();
+	public Vector<String> Friend = new Vector<String>();
+
 	/**
 	 * Launch the application.
 	 */
@@ -179,17 +183,62 @@ public class TalkServer extends JFrame {
 				AppendText("userService error");
 			}
 		}
-
+		
+		
+		public LoggedUser SearchUser(String UserName) {
+			for(LoggedUser f: FriendVector) {
+				if(f.UserName.equals(UserName)) 
+					return f;
+			}
+			return null;
+		}
+		/**/
 		public void Login(ChatMsg cm) {
 			AppendText(UserName + "로그인");
+			System.out.println("UserName: "+cm.UserName);
 			//WriteOne("Welcome to Java chat server\n");
 			//WriteOne(UserName); // 연결된 사용자에게 정상접속을 알림
 			//String msg = UserName;
 			//WriteOthers(msg); // 아직 user_vc에 새로 입장한 user는 포함되지 않았다.
 			
+			
+			LoggedUser user;
+			if((user = SearchUser(cm.UserName)) != null) { //이미 로그인한 user찾기 
+				user.UserStatus = "O";
+				user.UserStatusMsg = cm.UserStatusMsg;
+				
+				//다시 로그인한 유저에게 마지막 프로필을 보여주도록
+				ChatMsg cm2 = new ChatMsg(cm.UserName, "600", "profile modified");
+				cm2.img = user.profile;
+				WriteOneObject(cm2); //프로필 바뀐거 알려주고 
+			}
+			else {
+				user = new LoggedUser(cm.img, cm.UserName, "O", cm.UserStatusMsg);
+				FriendVector.add(user);
+			}
+			WriteOthersObject(cm);
+			
+			//로그인한 유저에게 기존 유저 목록 보내줌
+			for(LoggedUser User: FriendVector) {
+				for(int i=0; i < user_vc.size(); i++) {
+					UserService us = (UserService) user_vc.elementAt(i);
+					if(us.UserName != User.UserName) { //나를 제외한 기존 유저
+						ChatMsg obcm = new ChatMsg(User.UserName, "100", "Login");
+						obcm.img = User.profile;
+						obcm.UserStatus = User.UserStatus;
+						obcm.UserStatusMsg = User.UserStatusMsg;
+						us.WriteOneObject(obcm);
+					}
+				}
+			}
+			
+			/**/
+			/*
+			System.out.println("Server: cm.StatusMsg : "+cm.UserStatusMsg);
 			Friend.add(cm.UserName);
 			Friend f = new Friend(cm.img, cm.UserName, cm.data);
 			FriendVector.add(f);
+			
 			String list = "";
 			WriteAllObject(new ChatMsg(cm.UserName, cm.code, cm.data));
 			for(int i = 0; i < FriendVector.size(); i++) {
@@ -201,25 +250,17 @@ public class TalkServer extends JFrame {
 						System.out.println("사용자 목록 : " + FriendVector.get(i).UserName);
 					}
 				}
-				/*
-				if(i != Friend.size())
-					list += Friend.get(i).toString() + " ";
 				
-				
-				if(!Friend.get(i).equals(cm.UserName)) {
-					WriteAllObject(new ChatMsg(Friend.get(i).toString, "100", cm.data));
-				}
-				*/
-				
+//				if(i != Friend.size())
+//					list += Friend.get(i).toString() + " ";
+//				
+//				
+//				if(!Friend.get(i).equals(cm.UserName)) {
+//					WriteAllObject(new ChatMsg(Friend.get(i).toString, "100", cm.data));
+//				}
 			}
+			*/
 			
-			cm.userlist = list;
-			
-			//WriteAllObject(new ChatMsg(cm.UserName, cm.code, list));
-			//WriteAllObject(new ChatMsg(cm.UserName, "110", list));
-			AppendText("List : " + list);
-			//WriteAllObject(new ChatMsg(cm.UserName, cm.code, cm.data));
-			//System.out.println(UserVec.size());
 		}
 
 		public void Logout() {
@@ -255,6 +296,16 @@ public class TalkServer extends JFrame {
 					user.WriteOneObject(ob);
 			}
 		}
+		//
+		// 나를 제외한 User들에게 방송. 각각의 UserService Thread의 WriteONe() 을 호출한다.
+		public void WriteOthersObject(Object ob) {
+			for (int i = 0; i < user_vc.size(); i++) {
+				UserService user = (UserService) user_vc.elementAt(i);
+				if (user != this && user.UserStatus == "O")
+					user.WriteOneObject(ob);
+			}
+		}
+
 
 		// 나를 제외한 User들에게 방송. 각각의 UserService Thread의 WriteONe() 을 호출한다.
 		public void WriteOthers(String str) {
@@ -264,6 +315,7 @@ public class TalkServer extends JFrame {
 					user.WriteOne(str);
 			}
 		}
+
 
 		// Windows 처럼 message 제외한 나머지 부분은 NULL 로 만들기 위한 함수
 		public byte[] MakePacket(String msg) {
@@ -413,13 +465,51 @@ public class TalkServer extends JFrame {
 							}
 						} else { // 일반 채팅 메시지
 							UserStatus = "O";
-							//WriteAll(msg + "\n"); // Write All
+							
+							String data = cm.getData();
+							String first_data = data.substring(0, 1); //처음글자 "("
+							String final_data = data.substring(data.length()-1, data.length()); //마지막글자 ")"
+														
+							String[] emojiList = {"(곤란)", "(궁금)", "(깜찍)", "(놀람)", "(눈물)",
+									"(당황)", "(메롱)", "(미소)", "(민망)", "(반함)",
+									"(버럭)", "(부끄)", "(아픔)", "(안도)", "(우웩)",
+									"(윙크)", "(으으)", "(잘난척)", "(잘자)", "(잠)"};
+							ImageIcon[] emojiIconList = {
+									new ImageIcon("src/emoji/곤란.png"),
+									new ImageIcon("src/emoji/궁금.png"),
+									new ImageIcon("src/emoji/깜찍.png"),
+									new ImageIcon("src/emoji/놀람.png"),
+									new ImageIcon("src/emoji/눈물.png"),
+									new ImageIcon("src/emoji/당황.png"),
+									new ImageIcon("src/emoji/메롱.png"),
+									new ImageIcon("src/emoji/미소.png"),
+									new ImageIcon("src/emoji/민망.png"),
+									new ImageIcon("src/emoji/반함.png"),
+									new ImageIcon("src/emoji/버럭.png"),
+									new ImageIcon("src/emoji/부끄.png"),
+									new ImageIcon("src/emoji/아픔.png"),
+									new ImageIcon("src/emoji/안도.png"),
+									new ImageIcon("src/emoji/우웩.png"),
+									new ImageIcon("src/emoji/윙크.png"),
+									new ImageIcon("src/emoji/으으.png"),
+									new ImageIcon("src/emoji/잘난척.png"),
+									new ImageIcon("src/emoji/잘자.png"),
+									new ImageIcon("src/emoji/잠.png"),
+							};
+							
+							
+							for(int i=0; i<emojiList.length; i++) {
+								if(data.equals(emojiList[i])) {
+									cm.setImg(emojiIconList[i]);
+									cm.setCode("300");
+								}
+							}
 							WriteAllObject(cm);
 						}
 					} else if (cm.code.matches("400")) { // logout message 처리
 						Logout();
 						break;
-					} else if (cm.code.matches("300")) {
+					} else if (cm.code.matches("300")) { //Image, 이모티콘 처리
 						WriteAllObject(cm);
 						
 					 } else if (cm.code.matches("500")) {
@@ -435,6 +525,9 @@ public class TalkServer extends JFrame {
 					} else if (cm.code.matches("510")) {
 						//WriteAllObject(cm);
 						
+					} else if(cm.code.matches("600")) { //profile modified
+						System.out.println("Server Receive Editor");
+						WriteAllObject(cm);
 					}
 					
 					else if(cm.code.matches("800")) {

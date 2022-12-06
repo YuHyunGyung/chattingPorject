@@ -19,6 +19,9 @@ public class ChatRoom extends JPanel{
 	ImageIcon img;
 	String roomId;
 	String userlist;
+	String LastMsg;
+	
+	JLabel roomid, chatMsg, lblNewLabel;
 	//String UserStatusMsg;
 	
 	
@@ -44,27 +47,26 @@ public class ChatRoom extends JPanel{
 		});
 		add(roomImg);
 		
-		JLabel roomid = new JLabel(roomId);
+		roomid = new JLabel(roomId);
 		roomid.setBackground(new Color(255, 38, 0));
 		roomid.setBounds(60, 7, 220, 20);
 		roomid.setFont(new Font("Lucida Grande", Font.PLAIN, 15));
 		add(roomid);
 		
-		JLabel chatMsg = new JLabel(chatmsg);
+		chatMsg = new JLabel(chatmsg);
 		chatMsg.setBounds(60, 33, 231, 15);
 		add(chatMsg);
 		
-		JLabel lblNewLabel = new JLabel();
-		add(lblNewLabel);
+//		lblNewLabel = new JLabel();
+//		add(lblNewLabel);
 		
 		//mainView.textPaneChatList.insertComponent(this);
 		
 	}
 	
-	public ImageIcon imageSetSize(ImageIcon icon, int i, int j) { // image Size Setting
-		Image ximg = icon.getImage();  //ImageIcon을 Image로 변환.
-		Image yimg = ximg.getScaledInstance(i, j, java.awt.Image.SCALE_SMOOTH);
-		ImageIcon xyimg = new ImageIcon(yimg); 
-		return xyimg;
+	public void SetLastMsg(ChatMsg cm) {
+		LastMsg = cm.data;
+		chatMsg.setText(LastMsg);
+		
 	}
 }

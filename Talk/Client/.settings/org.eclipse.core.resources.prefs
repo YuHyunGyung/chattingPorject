@@ -1,4 +1,10 @@
 eclipse.preferences.version=1
 encoding//src/ChatClientChatRoomView.java=UTF-8
-encoding//src/TalkClientMain.java=UTF-8
+encoding//src/ChatClientSelectFriendDialog.java=MS949
+encoding//src/ChatMsg.java=MS949
+encoding//src/ChatRoom.java=MS949
+encoding//src/EmojiSelectFrame.java=MS949
+encoding//src/TalkClientMain.java=MS949
+encoding//src/TalkClientProfile.java=UTF-8
+encoding//src/TalkClientProfileFriend.java=UTF-8
 encoding/<project>=MS949

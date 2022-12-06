@@ -32,21 +32,22 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import javax.swing.JSeparator;
 
-public class TalkClientProfile extends JFrame{
+public class TalkClientProfileFriend extends JFrame{
 	
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	
+	boolean check = false;
 	private JTextField userName;
-	private JTextField selfChatText;
+	private JTextField ChatText;
 	private JTextField editProfileText;
 	private JTextField stateMsg;
+	
+	private ImageIcon msg = new ImageIcon(TalkClientProfileFriend.class.getResource("./img/msg.png"));
+	private ImageIcon edit = new ImageIcon(TalkClientProfileFriend.class.getResource("./img/profileEdit.png"));
+	private ImageIcon backgroundImg = new ImageIcon(TalkClientProfileFriend.class.getResource("./img/greyBack.jpeg"));
 
 	
-	private ImageIcon msg = new ImageIcon(TalkClientProfile.class.getResource("./img/msg.png"));
-	private ImageIcon edit = new ImageIcon(TalkClientProfile.class.getResource("./img/profileEdit.png"));
-	private ImageIcon backgroundImg = new ImageIcon(TalkClientProfile.class.getResource("./img/greyBack.jpeg"));
-
 	
 	private String UserName;
 	private String state;
@@ -56,10 +57,10 @@ public class TalkClientProfile extends JFrame{
 	/**
 	 * Create the frame.
 	 */
-	public TalkClientProfile(ChatClientMainView mainView, ImageIcon userimg, String username, String statemsg) {
+	public TalkClientProfileFriend(ChatClientMainView mainView, ImageIcon userimg, String username, String statemsg) {
 		this.mainView = mainView;
-		this.UserName = username;
 		this.UserProfile = userimg;
+		this.UserName = username;
 		this.state = statemsg;
 		
 		setBounds(150, 80, 394, 630);
@@ -69,26 +70,27 @@ public class TalkClientProfile extends JFrame{
 		contentPane.setLayout(null);
 
 		msg = mainView.imageSetSize(msg, 35, 35);
-		JButton selfChatButton = new JButton(msg);
-		selfChatButton.addActionListener(new ActionListener() {
+		JButton ChatButton = new JButton(msg);
+		ChatButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				dispose();
 				//new ChatClientChatRoomView(username, ip_addr, port_no);
 				//new TalkClientSelfRoom(username, socket, ois, oos);
 			}
 		});
-		selfChatButton.setBounds(65, 471, 50, 50);
-		selfChatButton.setBorderPainted(false);
-		selfChatButton.setContentAreaFilled(false);
-		selfChatButton.setOpaque(false);
-		contentPane.add(selfChatButton);
+		ChatButton.setBounds(170, 471, 50, 50);
+		ChatButton.setBorderPainted(false);
+		ChatButton.setContentAreaFilled(false);
+		ChatButton.setOpaque(false);
+		contentPane.add(ChatButton);
 		
+		/*
 		edit = mainView.imageSetSize(edit, 35, 35);
 		JButton editProfileButton = new JButton(edit);
 		editProfileButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//dispose();
-				TalkProfileEditor profileEditor = new TalkProfileEditor(mainView, UserProfile, UserName, state);
+				dispose();
+				new TalkProfileEditor(UserName);
 			}
 		});
 		editProfileButton.setBounds(264, 471, 50, 50);
@@ -96,6 +98,7 @@ public class TalkClientProfile extends JFrame{
 		editProfileButton.setContentAreaFilled(false);
 		editProfileButton.setOpaque(false);
 		contentPane.add(editProfileButton);
+		*/
 		
 		JButton profilePhoto = new JButton(mainView.imageSetSize(UserProfile, 90, 90));
 		profilePhoto.setBounds(153, 295, 90, 90);
@@ -114,15 +117,16 @@ public class TalkClientProfile extends JFrame{
 		contentPane.add(userName);
 		userName.setColumns(10);
 		
-		selfChatText = new JTextField();
-		selfChatText.setHorizontalAlignment(SwingConstants.CENTER);
-		selfChatText.setText("나와의 채팅");
-		selfChatText.setBounds(27, 522, 130, 26);
-		selfChatText.setBorder(javax.swing.BorderFactory.createEmptyBorder());
-		selfChatText.setOpaque(false);
-		contentPane.add(selfChatText);
-		selfChatText.setColumns(10);
+		ChatText = new JTextField();
+		ChatText.setHorizontalAlignment(SwingConstants.CENTER);
+		ChatText.setText("1:1 채팅");
+		ChatText.setBounds(130, 522, 130, 26);
+		ChatText.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+		ChatText.setOpaque(false);
+		contentPane.add(ChatText);
+		ChatText.setColumns(10);
 		
+		/*
 		editProfileText = new JTextField();
 		editProfileText.setHorizontalAlignment(SwingConstants.CENTER);
 		editProfileText.setText("프로필 편집");
@@ -131,6 +135,7 @@ public class TalkClientProfile extends JFrame{
 		editProfileText.setBorder(javax.swing.BorderFactory.createEmptyBorder());
 		contentPane.add(editProfileText);
 		editProfileText.setColumns(10);
+		*/
 		
 		JSeparator line = new JSeparator();
 		line.setBounds(41, 458, 296, 12);
@@ -149,8 +154,7 @@ public class TalkClientProfile extends JFrame{
 		background.setBackground(new Color(121, 121, 121));
 		background.setBounds(0, 0, 394, 605);
 		contentPane.add(background);
-		setVisible(true);
-		
+		setVisible(true);	
 	}
 	
 

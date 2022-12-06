@@ -11,10 +11,12 @@ class ChatMsg implements Serializable {
 	public String code; // 100:로그인, 400:로그아웃, 200:채팅메시지, 300:Image
 	public String data;
 	public ImageIcon img = new ImageIcon(TalkServer.class.getResource("./img/standardProfile.png"));
+	public ImageIcon Image; //주고받은 이미지
 	public String time;
 	public Date date;
 	public String roomId;
 	public String userlist;
+	public String UserStatus;
 	public String UserStatusMsg;
 	
 	public ChatMsg(String UserName, String code, String msg) {
@@ -22,4 +24,37 @@ class ChatMsg implements Serializable {
 		this.code = code;
 		this.data = msg;
 	}
+	
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+
+	public String getData() {
+		return data;
+	}
+	public void setData(String data) {
+		this.data = data;
+	}
+
+
+	public String getUserName() {
+		return UserName;
+	}
+
+	public void setUserName(String UserName) {
+		this.UserName = UserName;
+	}
+
+
+	public void setImg(ImageIcon img) {
+		this.img = img;
+	}
+	public ImageIcon getImg() {
+		return img;
+	}
+
 }

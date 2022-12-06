@@ -7,6 +7,7 @@ public class EmojiSelectFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private static final int BUF_LEN = 128; // Windows 처럼 BUF_LEN 을 정의
 
+	ChatClientMainView mainView;
 	ChatClientChatRoomView chatroom;
 	public JPanel contentPane;
 
@@ -34,7 +35,8 @@ public class EmojiSelectFrame extends JFrame {
 			new ImageIcon("src/emoji/잠.png"),
 	};
 	
-	EmojiSelectFrame(ChatClientChatRoomView chatroom) {
+	EmojiSelectFrame(ChatClientMainView mainView, ChatClientChatRoomView chatroom) {
+		this.mainView = mainView;
 		this.chatroom = chatroom;
 		setBounds(100, 300, 360, 321);
 		
@@ -48,7 +50,7 @@ public class EmojiSelectFrame extends JFrame {
 
 		//버튼 크기 55x55으로 맞추기
 		for(int i=0; i<20; i++) {
-			ImageIcon icon = chatroom.imageSetSize(ImageIcons[i], 55, 55); //new ImageIcon(new_img);
+			ImageIcon icon = mainView.imageSetSize(ImageIcons[i], 55, 55); //new ImageIcon(new_img);
 			
 			if(x >= 350) {
 				x = 0;
@@ -78,7 +80,7 @@ public class EmojiSelectFrame extends JFrame {
 					ChatMsg obcm = new ChatMsg(chatroom.UserName, "300", "IMG");
 					ImageIcon img = ImageIcons[i];
 					obcm.img = img;
-					chatroom.SendObject(obcm);
+					mainView.SendObject(obcm);
 					//setVisible(false);
 				}
 			}

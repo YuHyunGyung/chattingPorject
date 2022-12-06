@@ -62,10 +62,10 @@ public class ChatClientChatRoomView extends JFrame{
 	
 	//public ChatClientChatRoomView(String username, String ip_addr, String port_no) {
 	public ChatClientChatRoomView(ChatClientMainView mainView, String username, String roomId, String userlist, String ip_addr, String port_no) {
-
+		this.mainView = mainView;
 		this.ip_addr = ip_addr;
 		this.port_no = port_no;
-		//this.mainView = mainView;
+		
 		UserName = username;
 		view = this;
 		//this.roomId = roomId;
@@ -97,7 +97,7 @@ public class ChatClientChatRoomView extends JFrame{
 		contentPane.add(sendBtn);
 		
 		// 이모티콘 
-		emoImg = imageSetSize(emoImg, 28, 28);
+		emoImg = mainView.imageSetSize(emoImg, 28, 28);
 		emoticon = new JButton(emoImg);
 		emoticon.setBounds(5, 568, 29, 29);
 		emoticon.setBorderPainted(false);
@@ -106,7 +106,7 @@ public class ChatClientChatRoomView extends JFrame{
 		contentPane.add(emoticon);
 		
 		// 파일 
-		fileImg = imageSetSize(fileImg, 28, 28);
+		fileImg = mainView.imageSetSize(fileImg, 28, 28);
 		file = new JButton(fileImg);
 		file.setBounds(42, 568, 29, 29);
 		file.setBorderPainted(false);
@@ -135,7 +135,7 @@ public class ChatClientChatRoomView extends JFrame{
 		contentPane.add(roomName);
 		
 		// 채팅 검색 
-		search = imageSetSize(search, 29, 29);
+		search = mainView.imageSetSize(search, 29, 29);
 		JButton searchMsg = new JButton(search);
 		searchMsg.setBounds(292, 8, 29, 29);
 		searchMsg.setBorderPainted(false);
@@ -147,7 +147,7 @@ public class ChatClientChatRoomView extends JFrame{
 		exit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				ChatMsg msg = new ChatMsg(UserName, "400", "Bye");
-				SendObject(msg);
+				mainView.SendObject(msg);
 				setVisible(false);
 			}
 		});
@@ -163,7 +163,7 @@ public class ChatClientChatRoomView extends JFrame{
 			ois = new ObjectInputStream(socket.getInputStream());
 			
 			ChatMsg obcm = new ChatMsg(UserName, "100", "Hello");
-			SendObject(obcm);
+			mainView.SendObject(obcm);
 			
 			ListenNetwork net = new ListenNetwork();
 			net.start();
@@ -223,6 +223,7 @@ public class ChatClientChatRoomView extends JFrame{
 		                  msg = String.format("%s", cm.data);
 					} else
 						continue;
+					
 					switch (cm.code) {
 					case "200": // chat message
 						if(check==true)
@@ -258,12 +259,14 @@ public class ChatClientChatRoomView extends JFrame{
 		}
 	}
 	
+	/*
 	public ImageIcon imageSetSize(ImageIcon icon, int i, int j) { // image Size Setting
 		Image ximg = icon.getImage();  //ImageIcon을 Image로 변환.
 		Image yimg = ximg.getScaledInstance(i, j, java.awt.Image.SCALE_SMOOTH);
 		ImageIcon xyimg = new ImageIcon(yimg); 
 		return xyimg;
 	}
+	*/
 	
 	//이모티콘 보내기
 	class EmoticonSendAction implements ActionListener {
@@ -271,10 +274,9 @@ public class ChatClientChatRoomView extends JFrame{
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if(e.getSource() == emoticon) {
-				EmojiSelectFrame emoji = new EmojiSelectFrame(view);
+				EmojiSelectFrame emoji = new EmojiSelectFrame(mainView, view);
 			}
-		}
-		
+		}	
 	}
 	
 	// keyboard enter key 치면 서버로 전송
@@ -311,7 +313,7 @@ public class ChatClientChatRoomView extends JFrame{
 					ChatMsg obcm = new ChatMsg(UserName, "300", "IMG");
 					ImageIcon img = new ImageIcon(fd.getDirectory() + fd.getFile());
 					obcm.img = img;
-					SendObject(obcm);
+					mainView.SendObject(obcm);
 				}
 			}
 		}
@@ -319,7 +321,6 @@ public class ChatClientChatRoomView extends JFrame{
 
 	ImageIcon icon1 = new ImageIcon("src/icon1.jpg");
 	private JButton exit;
-	//private JTextArea textArea;
 
 	public void AppendIcon(ImageIcon icon) {
 		int len = textArea.getDocument().getLength();
@@ -520,6 +521,7 @@ public class ChatClientChatRoomView extends JFrame{
 		//gc2.drawImage(ori_img,  0,  0, panel.getWidth(), panel.getHeight(), panel);
 		//gc.drawImage(panelImage, 0, 0, panel.getWidth(), panel.getHeight(), panel);
 	}
+	
 	//이미지 오른쪽에 붙이기
 	public void AppendImageR(ImageIcon ori_icon) {
 		StyledDocument doc = textArea.getStyledDocument();
@@ -572,6 +574,7 @@ public class ChatClientChatRoomView extends JFrame{
 		textArea.setCaretPosition(len);
 		textArea.replaceSelection("\n");
 	}
+	
 	//이미지 왼쪽에 붙이기
 	public void AppendImageL(ImageIcon ori_icon) {
 		int len = textArea.getDocument().getLength();
@@ -611,6 +614,7 @@ public class ChatClientChatRoomView extends JFrame{
 		AppendTextL("\n");
 	}
 	
+	
 	public String getTime() {
 		LocalTime now = LocalTime.now();
 		int hour = now.getHour();
@@ -623,57 +627,13 @@ public class ChatClientChatRoomView extends JFrame{
 	    String time = ampm + " " + hour + ":" + minute + " ";
 		return time;
 	}
-
-	// Windows 처럼 message 제외한 나머지 부분은 NULL 로 만들기 위한 함수
-	public byte[] MakePacket(String msg) {
-		byte[] packet = new byte[BUF_LEN];
-		byte[] bb = null;
-		int i;
-		for (i = 0; i < BUF_LEN; i++)
-			packet[i] = 0;
-		try {
-			bb = msg.getBytes("euc-kr");
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			System.exit(0);
-		}
-		for (i = 0; i < bb.length; i++)
-			packet[i] = bb[i];
-		return packet;
-	}
-
+	
 	// Server에게 network으로 전송
 	public void SendMessage(String msg) {
-		try{
-			ChatMsg obcm = new ChatMsg(UserName, "200", msg);
-			oos.writeObject(obcm);
-		} catch(IOException e) {
-			AppendText("oos.writeObjecT() error");
-			try {
-				ois.close();
-				oos.close();
-				socket.close();
-			} catch(IOException e1) {
-				e1.printStackTrace();
-				System.exit(0);
-			}
-		}
-		
-		/*
 		ChatMsg cm = new ChatMsg(UserName, "200", msg);
-		cm.date = new Date();
-		cm.roomId = roomId; // 고유한 방 번호를 사용해야함
-		mainView.SendObject(cm); // mainView : 소켓을 최초로 생성한 클래스 
-		*/
+		//cm.date = new Date();
+		//cm.roomId = roomId;
+		mainView.SendObject(cm);
 	}
-
-	public void SendObject(Object ob) { // 서버로 메세지를 보내는 메소드
-		try {
-			oos.writeObject(ob);
-		} catch (IOException e) {
-			// textArea.append("메세지 송신 에러!!\n");
-			AppendText("SendObject Error");
-		}
-	}
+	
 }
