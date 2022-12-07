@@ -80,6 +80,8 @@ public class EmojiSelectFrame extends JFrame {
 					ChatMsg obcm = new ChatMsg(chatroom.UserName, "300", "IMG");
 					ImageIcon img = ImageIcons[i];
 					obcm.Image = img;
+					obcm.roomId = chatroom.roomId;
+					obcm.userlist = chatroom.userlist;
 					mainView.SendObject(obcm);
 					//setVisible(false);
 				}

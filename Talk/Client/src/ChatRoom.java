@@ -62,6 +62,7 @@ public class ChatRoom extends JPanel{
 		
 	}
 	
+	
 	public void paint(Graphics g) {
 		super.paint(g);
 		if(tmpImg == null) {
@@ -70,6 +71,7 @@ public class ChatRoom extends JPanel{
 			SetChatRoomIcon();
 		}
 	}
+	
 	
 	public void NewChatClientRoomView() {
 		chatRoom = new ChatClientChatRoomView(mainView, UserName, roomId, userlist);

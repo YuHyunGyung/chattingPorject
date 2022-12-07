@@ -523,7 +523,7 @@ public class TalkServer extends JFrame {
 							UserService user = (UserService) user_vc.elementAt(j);
 							for(int i = 0; i < list.length; i++)
 								if (list[i].equals(user.UserName)) {
-									ChatMsg cm2 = new ChatMsg(list[j], "500", cm.data);
+									ChatMsg cm2 = new ChatMsg(list[j], "510", cm.data);
 									cm2.roomId = cm.roomId;
 									cm2.userlist = cm.userlist;
 									user.WriteOneObject(cm2);

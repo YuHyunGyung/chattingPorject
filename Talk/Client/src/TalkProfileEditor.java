@@ -118,6 +118,7 @@ public class TalkProfileEditor extends JFrame{
 				
 				if (fd.getDirectory().length() > 0 && fd.getFile().length() > 0) {
 					ImageIcon img = new ImageIcon(fd.getDirectory() + fd.getFile());
+					img = mainView.imageSetSize(img, 90, 90);
 					profilePhoto.setIcon(img);
 					UserIcon = img;
 				}

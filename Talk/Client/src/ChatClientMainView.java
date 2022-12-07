@@ -288,10 +288,11 @@ public class ChatClientMainView extends JFrame{
 						break;
 						
 					case "500": //채팅방 목록 만들기
-						AddChatRoom(cm);
+						
 						break;
 						
 					case "510":
+						AddChatRoom(cm);
 						break;
 						
 					case "600": //profile modified
