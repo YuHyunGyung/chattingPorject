@@ -30,6 +30,7 @@ public class ChatClientChatRoomView extends JFrame{
 	
 	private JTextPane textArea;
 	
+	public Vector<Friend> FriendVector = new Vector<Friend>();
 	//private ArrayList<FriendLabel> Friends = new ArrayList<FriendLabel>();
 	//private Map<String, FriendLabel> Friends = new HashMap<String, FriendLabel>();
 	
@@ -318,18 +319,30 @@ public class ChatClientChatRoomView extends JFrame{
 		//FriendLabel f2 = new FriendLabel(cm.UserImg, f.UserName);
 		//FriendLabelList.add(f2);
 		
+		Friend f;
+		for(Friend f1 : mainView.FriendVector) {
+			if(f1.UserName.equals(cm.UserName))
+				cm.img = f1.UserImg;
+		}
+		
+		
+		//System.out.println("친구 정보 : " + f.UserName);
+		
 		int len = textArea.getDocument().getLength();
 		textArea.setCaretPosition(len);
 		
-		TextLeft tl = new TextLeft(mainView, cm.img, cm.UserName, getTime());
+		//TextLeft tl = new TextLeft(mainView, cm.img, cm.UserName, getTime());
+		
+		TextLeft tl = new TextLeft(cm);
 		FriendProfileList.add(tl);
-		textArea.setCaretPosition(textArea.getDocument().getLength());
 		textArea.insertComponent(tl);
+		textArea.setCaretPosition(0);
 		AppendTextL("\n");
 		
 		
 		len = textArea.getDocument().getLength();
 		textArea.setCaretPosition(len);
+		
 		
 		JLabel m = new JLabel(" " + cm.data + " ");
 		m.setBorder(null);
@@ -340,6 +353,7 @@ public class ChatClientChatRoomView extends JFrame{
 		len = textArea.getDocument().getLength();
 		textArea.setCaretPosition(len);
 		AppendTextL("\n");
+		
 	}
 
 	// 메세지 화면 우측에 출력
@@ -557,6 +571,7 @@ public class ChatClientChatRoomView extends JFrame{
 	public void SendMessage(String msg) {
 		ChatMsg cm = new ChatMsg(UserName, "200", msg);
 		cm.date = new Date();
+		cm.time = getTime();
 		cm.roomId = roomId; // 고유한 방 번호를 사용해야함
 		cm.userlist = userlist;
 		mainView.SendObject(cm); // mainView : 소켓을 최초로 생성한 클래스 

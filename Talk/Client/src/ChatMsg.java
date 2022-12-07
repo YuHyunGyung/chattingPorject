@@ -14,6 +14,7 @@ class ChatMsg implements Serializable {
 	public ImageIcon Image; //사진파일
 	public String time;
 	public Date date;
+	//public String time;
 	public String roomId;
 	public String userlist;
 	public String UserStatusMsg; //유저 상태메세지
