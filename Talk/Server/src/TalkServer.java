@@ -186,30 +186,33 @@ public class TalkServer extends JFrame {
 		
 		
 		public LoggedUser SearchUser(String UserName) {
+			System.out.println("Server LoggedUser In : " + UserName);
 			for(LoggedUser f: FriendVector) {
+				System.out.println("Server SearchUser : " + f.UserName);
+				System.out.println("Server SearchUser Msg : " + f.UserStatusMsg);
 				if(f.UserName.equals(UserName)) 
 					return f;
 			}
 			return null;
 		}
+		
 		/**/
 		public void Login(ChatMsg cm) {
 			AppendText(UserName + "로그인");
 			System.out.println("UserName: "+cm.UserName);
-			//WriteOne("Welcome to Java chat server\n");
-			//WriteOne(UserName); // 연결된 사용자에게 정상접속을 알림
-			//String msg = UserName;
-			//WriteOthers(msg); // 아직 user_vc에 새로 입장한 user는 포함되지 않았다.
 			
 			
 			LoggedUser user;
 			if((user = SearchUser(cm.UserName)) != null) { //이미 로그인한 user찾기 
 				user.UserStatus = "O";
-				user.UserStatusMsg = cm.UserStatusMsg;
+				
+				//user.UserStatusMsg = cm.UserStatusMsg;
 				
 				//다시 로그인한 유저에게 마지막 프로필을 보여주도록
 				ChatMsg cm2 = new ChatMsg(cm.UserName, "600", "profile modified");
 				cm2.img = user.profile;
+				cm2.UserStatus = user.UserStatus;
+				cm2.UserStatusMsg = user.UserStatusMsg;
 				WriteOneObject(cm2); //프로필 바뀐거 알려주고 
 			}
 			else {
@@ -233,44 +236,32 @@ public class TalkServer extends JFrame {
 			}
 			
 			/**/
-			/*
-			System.out.println("Server: cm.StatusMsg : "+cm.UserStatusMsg);
-			Friend.add(cm.UserName);
-			Friend f = new Friend(cm.img, cm.UserName, cm.data);
-			FriendVector.add(f);
-			
-			String list = "";
-			WriteAllObject(new ChatMsg(cm.UserName, cm.code, cm.data));
-			for(int i = 0; i < FriendVector.size(); i++) {
-				AppendText("친구 Vector : " + FriendVector.get(i).UserName);
-				for (int j = 0; j < user_vc.size(); j++) {
-					UserService user = (UserService) user_vc.elementAt(j);
-					if (user.UserName != FriendVector.get(i).UserName) {
-						user.WriteOneObject(new ChatMsg(FriendVector.get(i).UserName, "100", FriendVector.get(j).UserStatusMsg));
-						System.out.println("사용자 목록 : " + FriendVector.get(i).UserName);
-					}
+			//채팅 목록 보내줌
+			for(ChatRoom Room: ChatRoomVector) {
+				if(Room.userList.contains(UserName)) {
+					ChatMsg obcm = new ChatMsg(UserName, "500", "New Room");
+					obcm.roomId = Room.roomId;
+					obcm.userlist = Room.userList;
+					WriteOneObject(obcm);
+					
+//					for(ChatMsg cm2 : Room.ChatMsgList) { //메세지 백업
+//						
+//					}
 				}
-				
-//				if(i != Friend.size())
-//					list += Friend.get(i).toString() + " ";
-//				
-//				
-//				if(!Friend.get(i).equals(cm.UserName)) {
-//					WriteAllObject(new ChatMsg(Friend.get(i).toString, "100", cm.data));
-//				}
 			}
-			*/
-			
+						
 		}
 
 		public void Logout() {
 			String msg = "[" + UserName + "]님이 퇴장 하였습니다.\n";
 			UserVec.removeElement(this); // Logout한 현재 객체를 벡터에서 지운다
 			Friend.removeElement(UserName);
+			/*
 			for(int i = 0; i < FriendVector.size(); i++) {
 				if(FriendVector.get(i).UserName.equals(UserName))
 					FriendVector.remove(i);
 			}
+			*/
 			String list = "";
 			for(int i = 0; i < Friend.size(); i++) {
 				AppendText(Friend.get(i).toString());
@@ -341,7 +332,7 @@ public class TalkServer extends JFrame {
 				ChatMsg obcm = new ChatMsg("SERVER", "200", msg);
 				oos.writeObject(obcm);
 			} catch (IOException e) {
-				AppendText("dos.writeObject() error");
+				AppendText("Server WriteOne dos.writeObject() error");
 				try {
 					ois.close();
 					oos.close();
@@ -377,12 +368,13 @@ public class TalkServer extends JFrame {
 				Logout(); // 에러가난 현재 객체를 벡터에서 지운다
 			}
 		}
+		
 		public void WriteOneObject(Object ob) {
 			try {
 			    oos.writeObject(ob);
 			} 
 			catch (IOException e) {
-				AppendText("oos.writeObject(ob) error");		
+				AppendText("Server WrtieOneObject oos.writeObject(ob) error");		
 				try {
 					ois.close();
 					oos.close();
@@ -497,14 +489,21 @@ public class TalkServer extends JFrame {
 									new ImageIcon("src/emoji/잠.png"),
 							};
 							
-							
+							String[] list = cm.userlist.split(" ");
+							 
 							for(int i=0; i<emojiList.length; i++) {
 								if(data.equals(emojiList[i])) {
-									cm.setImg(emojiIconList[i]);
+									cm.setImage(emojiIconList[i]);
 									cm.setCode("300");
 								}
 							}
-							WriteAllObject(cm);
+							 for (int j = 0; j < user_vc.size(); j++) {
+									UserService user = (UserService) user_vc.elementAt(j);
+									for(int i = 0; i < list.length; i++)
+										if (list[i].equals(user.UserName)) {
+											user.WriteOneObject(cm);
+										}
+								}
 						}
 					} else if (cm.code.matches("400")) { // logout message 처리
 						Logout();
@@ -513,20 +512,34 @@ public class TalkServer extends JFrame {
 						WriteAllObject(cm);
 						
 					 } else if (cm.code.matches("500")) {
-						 AppendText("채팅방이름 : " + cm.data);
-						 String [] list = cm.data.split(" ");
+						 AppendText("채팅방이름 : " + cm.roomId);
+						 String [] list = cm.userlist.split(" ");
+						 
+						 ChatRoom cr = new ChatRoom(cm.roomId, cm.userlist);
+						 ChatRoomVector.add(cr);
+						 
 						 for (int j = 0; j < user_vc.size(); j++) {
+							System.out.println("list["+j+"] : "+list[j]);
 							UserService user = (UserService) user_vc.elementAt(j);
 							for(int i = 0; i < list.length; i++)
 								if (list[i].equals(user.UserName)) {
-									user.WriteOneObject(new ChatMsg(list[i], "510", cm.data));
+									ChatMsg cm2 = new ChatMsg(list[j], "500", cm.data);
+									cm2.roomId = cm.roomId;
+									cm2.userlist = cm.userlist;
+									user.WriteOneObject(cm2);
 								}
 						}
 					} else if (cm.code.matches("510")) {
 						//WriteAllObject(cm);
 						
 					} else if(cm.code.matches("600")) { //profile modified
-						System.out.println("Server Receive Editor");
+						
+						LoggedUser user;
+						if((user = SearchUser(cm.UserName)) != null) { //이미 로그인한 user찾기 
+							user.profile = cm.img;
+							user.UserStatusMsg = cm.UserStatusMsg;
+							System.out.println("Server protocol 600 - UserStatusMsg: " + user.UserStatusMsg);
+						}
 						WriteAllObject(cm);
 					}
 					
@@ -534,7 +547,7 @@ public class TalkServer extends JFrame {
 						
 					}
 				} catch (IOException e) {
-					AppendText("ois.readObject() error" + e);
+					AppendText("Server ois.readObject() error" + e);
 					try {
 						ois.close();
 						oos.close();

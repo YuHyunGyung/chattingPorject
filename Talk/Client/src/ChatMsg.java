@@ -18,6 +18,7 @@ class ChatMsg implements Serializable {
 	public String userlist;
 	public String UserStatusMsg; //유저 상태메세지
 	public String UserStatus; //유저 상태
+	public Boolean online;
 	
 	public ChatMsg(String UserName, String code, String msg) {
 		this.UserName = UserName;

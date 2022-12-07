@@ -19,9 +19,11 @@ import javax.swing.JList;
 
 public class ChatClientMainView extends JFrame{
 	private static final long serialVersionUID = 1L;
+	private static final int BUF_LEN = 128; // Windows 처럼 BUF_LEN 을 정의
+	
 	public Vector<ChatRoom> ChatRoomVector = new Vector<ChatRoom>();
 	public String UserName;
-	public ChatClientMainView mainView;
+	
 	public ImageIcon UserIcon;
 	public ImageIcon profile = new ImageIcon(ChatClientMainView.class.getResource("./img/standardProfile.png"));
 	
@@ -43,19 +45,22 @@ public class ChatClientMainView extends JFrame{
 	public JPanel friendHeader;
 	public JLabel friendLabel;
 	
-	private Socket socket;
-	private ObjectInputStream ois;
-	private ObjectOutputStream oos;
+	Socket socket;
+	ObjectInputStream ois;
+	ObjectOutputStream oos;
 	private JLabel chatLabel;
 	public String ip_addr;
 	public String port_no;
 	
 	boolean check = false;
+
+	public ChatClientMainView mainView;
+	public ChatClientChatRoomView chatroom;
 	
 	
 	public ChatClientMainView(String username, String ip_addr, String port_no) {
 		this.mainView = this;
-		UserName = username;
+		this.UserName = username;
 		this.ip_addr = ip_addr;
 		this.port_no = port_no;
 		
@@ -223,6 +228,25 @@ public class ChatClientMainView extends JFrame{
 		}
 	}
 	
+	public void AppendText(ChatMsg cm) {
+		ChatRoom r;
+		System.out.println("MainView AppendText roomId : "+ cm.roomId);
+		if((r = SearchChatRoom(cm.roomId)) != null) {
+			if(r.chatRoom == null)
+				r.NewChatClientRoomView();
+			r.AppendText(cm);
+		}
+	}
+	public void AppendImage(ChatMsg cm) {
+		ChatRoom r;
+		if((r = SearchChatRoom(cm.roomId)) != null) {
+			if(r.chatRoom == null)
+				r.NewChatClientRoomView();
+			r.AppendImage(cm);
+			System.out.println("MainView AppendImage : "+cm.data +", "+cm.date);
+		}
+	}
+	
 	class ListenNetwork extends Thread {
 		public void run() {
 			while (true) {
@@ -233,7 +257,6 @@ public class ChatClientMainView extends JFrame{
 					try {
 						obcm = ois.readObject();
 					} catch (ClassNotFoundException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 						break;
 					}
@@ -242,43 +265,43 @@ public class ChatClientMainView extends JFrame{
 					
 					if (obcm instanceof ChatMsg) {
 						cm = (ChatMsg) obcm;
+		                // 내가 채팅 보낼때 오른쪽
+		                if(cm.UserName.equals(UserName)) {
+		                	check = true;
+		                }
+		                else {
+		                	check = false;
+		                }
 					} else
 						continue;
 					switch (cm.code) {
 					case "100": //login
 						LoginNewFriend(cm);
 						break;
+						
 					case "200": // chat message
-						/*
-						if(check==true)
-							AppendTextR(msg);
-						else
-							//AppendText(msg);
-							AppendTextL(cm);
-						*/
+						AppendText(cm);
 						break;
+						
 					case "300": // Image, Icon 첨부
-						//AppendText("[" + cm.getId() + "]");
-						/*
-						if(check==true)
-							AppendImageR(cm.img);
-						else
-							AppendImageL(cm.img);
-						*/
+						AppendImage(cm);
 						break;
-					case "500":
-						break;
-					case "510": //채팅방 만들기
+						
+					case "500": //채팅방 목록 만들기
 						AddChatRoom(cm);
 						break;
+						
+					case "510":
+						break;
+						
 					case "600": //profile modified
-						System.out.println("Client Recieve Editor");
+						//System.out.println("Client Recieve Editor");
 						ChangeFriendProfile(cm);
 						break;
 						
 					}
 				} catch (IOException e) {
-					System.out.println(e + "	ois.readObject() error");
+					System.out.println(e + "Client MainView ois.readObject() error");
 					try {
 //						dos.close();
 //						dis.close();
@@ -295,29 +318,29 @@ public class ChatClientMainView extends JFrame{
 			}
 		}
 	}
+
 	
 	public String ShowDialog() {
 		
 		return "";
 	}
 	
+	/*유저 새로 들어 왔을때*/
 	public void LoginNewFriend(ChatMsg cm) {
 		for(Friend f : FriendVector) {
-			if(f.UserName.equals(cm.UserName)) {
+			if(f.UserName.equals(cm.UserName)) { //이미 로그인한 유저 잡아내기
 				/*
-				if(f.UserName.equals(cm.UserName)) 
-					//f.SetOnine(true);
-				
+				if(cm.UserStatus.equals("O"))
+					f.SetOnline(true);
 				else
-					//f.SetOnline(false);
-				*/
-				//f.SetStatusMsg();
+					f.SetOnline(false);
+				f.SetStatusMsg(cm);
+				/**/
 				return;
 			
 			}
 		}
 		AddFriend(cm.img, cm.UserName, "O", cm.UserStatusMsg);
-		System.out.println("UserStatusMsg: "+cm.UserStatusMsg);
 	}
 	
 	public void LogoutFriend(ChatMsg cm) {
@@ -328,17 +351,25 @@ public class ChatClientMainView extends JFrame{
 		}
 	}
 	
-	//프로필 사진 변경
+	//프로필 사진, 상태메세지 변경 됐을때
 	public void ChangeFriendProfile(ChatMsg cm) {
-		System.out.println("ChangenFriendProfile");
-		
 		UserIcon = cm.img;
 		for(Friend f : FriendVector) {
 			if(f.UserName.equals(cm.UserName)) {
+				f.UserImg = cm.img;
+				f.UserStatusMsg = cm.UserStatusMsg;
 				f.SetIcon(cm);
+				f.SetStatusMsg(cm);
 			}
 			//
 		}
+		
+		for(ChatRoom r : ChatRoomVector) {
+			if(r.userlist.contains(cm.UserName)) {
+				r.SetChatRoomIcon();
+			}
+		}
+		repaint();
 	}
 	
 	//새로운 친구 추가될때
@@ -362,23 +393,6 @@ public class ChatClientMainView extends JFrame{
 		return null;
 	}
 	
-	
-	public void NewChatClientRoomView() {
-		//roomView = new ChatClientMainView(mainview, UserName, roomId, UserList);
-	}
-	
-	public void AddChatRoom(ChatMsg cm) {
-		int len = textPaneChatList.getDocument().getLength();
-		textPaneChatList.setCaretPosition(len);
-		
-		ChatRoom r = new ChatRoom(mainView, cm.data, "새로운 채팅방이 생성되었습니다.");
-		r.userlist = cm.userlist;
-		textPaneChatList.insertComponent(r);
-		ChatRoomVector.add(r);
-		textPaneChatList.setCaretPosition(0);
-		repaint();
-	}
-	
 	public ChatRoom SearchChatRoom(String roomId) {
 		for(ChatRoom r : ChatRoomVector) {
 			if(r.roomId.equals(roomId))
@@ -387,14 +401,25 @@ public class ChatClientMainView extends JFrame{
 		return null;
 	}
 	
-
+	public void AddChatRoom(ChatMsg cm) {
+		ChatRoom r = new ChatRoom(mainView, UserName, cm.roomId, cm.userlist, cm.data);
+		System.out.println("MainView AddChatroom LastMsg : " + r.LastMsg);
+		System.out.println("MainView AddChatroom cm.data : " + cm.data);
+		
+		int len = textPaneChatList.getDocument().getLength();
+		textPaneChatList.setCaretPosition(len);
+		textPaneChatList.insertComponent(r);
+		ChatRoomVector.add(r);
+		textPaneChatList.setCaretPosition(0);
+		repaint();
+	}
 	
 	public void SendObject(Object ob) { // 서버로 메세지를 보내는 메소드
 		try {
 			oos.writeObject(ob);
 		} catch (IOException e) {
 			// textArea.append("메세지 송신 에러!!\n");
-			System.out.println(e + "	SendObject Error");
+			System.out.println(e + "SendObject Error");
 		}
 	}
 	

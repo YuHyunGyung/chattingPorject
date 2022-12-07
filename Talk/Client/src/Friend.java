@@ -7,12 +7,19 @@ public class Friend extends JPanel{
 	private static final long serialVersionUID = 1L;
 	
 	public ImageIcon UserImg;
-	JButton imgBtn;
-	JLabel name, stateMsg;
+	public JButton imgBtn;
+	public JLabel name;
+	public JLabel stateMsg;
+	
 	public String UserName;
 	public String UserStatus;
 	public String UserStatusMsg;
+	public JCheckBox checkBox;
 	
+	public Boolean online;
+	public Icon online_notchecked = new ImageIcon(Friend.class.getResource("./img/online.png"));
+	public Icon offline_notchekced = new ImageIcon(Friend.class.getResource("./img/offline.png"));
+
 	ChatClientMainView mainView;
 	
 	public Friend(ChatClientMainView mainView, ImageIcon userimg, String username, String userstatus, String statemsg) {
@@ -52,9 +59,14 @@ public class Friend extends JPanel{
 		stateMsg.setBounds(72, 35, 155, 16);
 		add(stateMsg);
 		
-		JCheckBox chckbxNewCheckBox = new JCheckBox("");
-		chckbxNewCheckBox.setBounds(280, 18, 26, 23);
-		add(chckbxNewCheckBox);
+		checkBox = new JCheckBox("", true);
+		//checkBox.setIcon(online_notchecked);
+		//checkBox.setSelectedIcon(online_notchecked);
+		//checkBox.setDisabledIcon(online_notchecked);
+		checkBox.setBorder(null);
+		checkBox.setBounds(280, 18, 26, 23);
+		checkBox.setEnabled(false);
+		add(checkBox);
 		
 		
 	}
@@ -64,18 +76,33 @@ public class Friend extends JPanel{
 			System.out.println("채팅방 클릭");
 			ChatMsg cm = new ChatMsg(UserName, "500", UserName + " " + mainView.UserName);
 			mainView.SendObject(cm);
-			ChatClientChatRoomView chatRoom = new ChatClientChatRoomView(mainView, mainView.UserName, UserName, UserName, mainView.ip_addr, mainView.port_no);
+			ChatClientChatRoomView chatRoom = new ChatClientChatRoomView(mainView, mainView.UserName, UserName, UserName);
         }        
     }
 	
 	//프로필 사진 바꾸었을때
 	public void SetIcon(ChatMsg cm) {
-		UserImg = cm.img;
+		//UserImg = cm.img;
 		ImageIcon Img = mainView.imageSetSize(UserImg, imgBtn.getWidth(), imgBtn.getHeight());
 		imgBtn.setIcon(Img);
 	}
 	
+	//상태메세지 바꾸었을때
 	public void SetStatusMsg(ChatMsg cm) {
+		//UserStatusMsg = cm.UserStatusMsg;
+		stateMsg.setText(UserStatusMsg);
+	}
+	
+	//checkbox 상태에 따라 이미지 다르게
+	public void SetSelectCheckBox(Boolean onoff) {
+		if(online) {
+			//checkBox.setIcon();
+			checkBox.setSelected(false);
+		}
+		checkBox.setEnabled(onoff);
+	}
+	
+	public void SetOnline(Boolean online) {
 		
 	}
 	

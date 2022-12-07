@@ -30,8 +30,10 @@ public class FriendLabel extends JPanel{
 	public String UserName;
 	public ImageIcon UserImg = new ImageIcon(FriendLabel.class.getResource("./img/standardProfile.png"));
 	public boolean check = false;
+	public ChatClientMainView mainView;
 	
-	public FriendLabel(ImageIcon userImg, String username) {
+	public FriendLabel(ChatClientMainView mainView, ImageIcon userImg, String username) {
+		this.mainView = mainView;
 		UserImg = userImg;
 		UserName = username;
 		
@@ -39,7 +41,7 @@ public class FriendLabel extends JPanel{
 		setBackground(new Color(255, 255, 255));
 		setLayout(null);
 		
-		UserImg = imageSetSize(UserImg, 56, 56);
+		UserImg = mainView.imageSetSize(UserImg, 56, 56);
 		profile = new JButton(UserImg);
 		profile.setBounds(4, 5, 50, 50);
 		add(profile);
@@ -69,12 +71,5 @@ public class FriendLabel extends JPanel{
 			}
 		}
 		
-	}
-	
-	public ImageIcon imageSetSize(ImageIcon icon, int i, int j) { // image Size Setting
-		Image ximg = icon.getImage();  //ImageIcon을 Image로 변환.
-		Image yimg = ximg.getScaledInstance(i, j, java.awt.Image.SCALE_SMOOTH);
-		ImageIcon xyimg = new ImageIcon(yimg); 
-		return xyimg;
 	}
 }

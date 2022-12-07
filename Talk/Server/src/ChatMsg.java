@@ -28,7 +28,6 @@ class ChatMsg implements Serializable {
 	public String getCode() {
 		return code;
 	}
-
 	public void setCode(String code) {
 		this.code = code;
 	}
@@ -49,12 +48,18 @@ class ChatMsg implements Serializable {
 		this.UserName = UserName;
 	}
 
-
-	public void setImg(ImageIcon img) {
-		this.img = img;
+	public void setImg(ImageIcon profile) {
+		this.img = profile;
 	}
 	public ImageIcon getImg() {
 		return img;
+	}
+
+	public void setImage(ImageIcon img) {
+		this.Image = img;
+	}
+	public ImageIcon getImage() {
+		return Image;
 	}
 
 }

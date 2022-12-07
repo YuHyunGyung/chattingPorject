@@ -83,23 +83,7 @@ public class TalkClientProfileFriend extends JFrame{
 		ChatButton.setContentAreaFilled(false);
 		ChatButton.setOpaque(false);
 		contentPane.add(ChatButton);
-		
-		/*
-		edit = mainView.imageSetSize(edit, 35, 35);
-		JButton editProfileButton = new JButton(edit);
-		editProfileButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				dispose();
-				new TalkProfileEditor(UserName);
-			}
-		});
-		editProfileButton.setBounds(264, 471, 50, 50);
-		editProfileButton.setBorderPainted(false);
-		editProfileButton.setContentAreaFilled(false);
-		editProfileButton.setOpaque(false);
-		contentPane.add(editProfileButton);
-		*/
-		
+				
 		JButton profilePhoto = new JButton(mainView.imageSetSize(UserProfile, 90, 90));
 		profilePhoto.setBounds(153, 295, 90, 90);
 		profilePhoto.setBorderPainted(false);
@@ -108,6 +92,7 @@ public class TalkClientProfileFriend extends JFrame{
 		contentPane.add(profilePhoto);
 		
 		userName = new JTextField();
+		userName.setEditable(false);
 		userName.setHorizontalAlignment(SwingConstants.CENTER);
 		userName.setBackground(new Color(254, 255, 255));
 		userName.setText(username);
@@ -118,6 +103,7 @@ public class TalkClientProfileFriend extends JFrame{
 		userName.setColumns(10);
 		
 		ChatText = new JTextField();
+		ChatText.setEditable(false);
 		ChatText.setHorizontalAlignment(SwingConstants.CENTER);
 		ChatText.setText("1:1 채팅");
 		ChatText.setBounds(130, 522, 130, 26);
@@ -126,23 +112,13 @@ public class TalkClientProfileFriend extends JFrame{
 		contentPane.add(ChatText);
 		ChatText.setColumns(10);
 		
-		/*
-		editProfileText = new JTextField();
-		editProfileText.setHorizontalAlignment(SwingConstants.CENTER);
-		editProfileText.setText("프로필 편집");
-		editProfileText.setBounds(228, 522, 130, 26);
-		editProfileText.setOpaque(false);
-		editProfileText.setBorder(javax.swing.BorderFactory.createEmptyBorder());
-		contentPane.add(editProfileText);
-		editProfileText.setColumns(10);
-		*/
-		
 		JSeparator line = new JSeparator();
 		line.setBounds(41, 458, 296, 12);
 		contentPane.add(line);
 		
 		state = statemsg; //profileInfo.getStateMsg();
 		stateMsg = new JTextField(state);
+		stateMsg.setEditable(false);
 		stateMsg.setHorizontalAlignment(SwingConstants.CENTER);
 		stateMsg.setBounds(6, 426, 382, 35);
 		stateMsg.setOpaque(false);

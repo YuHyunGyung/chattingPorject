@@ -7,19 +7,24 @@ import javax.swing.border.*;
 public class TalkProfileEditor extends JFrame{
 	private static final long serialVersionUID = 1L;
 	
-	private JPanel contentPane;
+
 	public ChatClientMainView mainView;
+	public TalkClientProfile clientProfile;
+	
+	private JPanel contentPane;
+	
+	private ImageIcon UserIcon;
+	private ImageIcon profile;
+	private ImageIcon back = new ImageIcon(TalkProfileEditor.class.getResource("./img/greyBack.jpeg"));
+
+	
 	private String UserName;
 	private String UserStatusMsg;
 	
-
 	
-	//private ProfileInfo profileInfo = new ProfileInfo(UserName);
-	private ImageIcon profile;
-	//private ImageIcon back = profileInfo.getBackgroundImg();
-	private ImageIcon back = new ImageIcon(TalkProfileEditor.class.getResource("./img/greyBack.jpeg"));
+	private JButton profilePhoto;
+	private JButton checkBtn;
 	
-	private JButton profilePhoto, checkBtn;
 	private JTextField name;
 	private JTextField stateMsg;
 	
@@ -27,11 +32,13 @@ public class TalkProfileEditor extends JFrame{
 	private FileDialog fd;
 
 	
-	public TalkProfileEditor(ChatClientMainView mainView, ImageIcon UserImage, String username, String UserStatusMsg) {
+	public TalkProfileEditor(ChatClientMainView mainView, TalkClientProfile clientProfile, ImageIcon UserImage, String username, String UserStatusMsg) {
 		this.mainView = mainView;
+		this.clientProfile = clientProfile;
 		this.UserName = username;
 		this.UserStatusMsg = UserStatusMsg;
 		this.profile = UserImage;
+		UserIcon = UserImage;
 
 		setBounds(200, 60, 394, 630);
 		contentPane = new JPanel();
@@ -95,12 +102,14 @@ public class TalkProfileEditor extends JFrame{
 		
 		ImageSendAction action = new ImageSendAction();
 		profilePhoto.addActionListener(action);
+		checkBtn.addActionListener(action);
 
 	}
 	
 	class ImageSendAction implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
+					
 			// 액션 이벤트가 sendBtn일때 또는 textField 에세 Enter key 치면
 			if (e.getSource() == profilePhoto) {
 				frame = new Frame("이미지첨부");
@@ -108,13 +117,24 @@ public class TalkProfileEditor extends JFrame{
 				fd.setVisible(true);
 				
 				if (fd.getDirectory().length() > 0 && fd.getFile().length() > 0) {
-					ChatMsg obcm = new ChatMsg(UserName, "600", "IMG");
 					ImageIcon img = new ImageIcon(fd.getDirectory() + fd.getFile());
-					obcm.img = img;
-					mainView.SendObject(obcm);
-					//dispose();
-					System.out.println("SendObject Editor");
+					profilePhoto.setIcon(img);
+					UserIcon = img;
 				}
+			}
+			
+			if (e.getSource() == checkBtn) {
+				ChatMsg obcm2 = new ChatMsg(UserName, "600", "IMG/StatusMsg");
+				UserStatusMsg = stateMsg.getText();
+				obcm2.UserStatusMsg = UserStatusMsg;
+				obcm2.img = UserIcon;
+				
+				clientProfile.UserProfile = UserIcon;
+				clientProfile.state = UserStatusMsg;
+				clientProfile.profilePhoto.setIcon(UserIcon);
+				clientProfile.stateMsg.setText(UserStatusMsg);
+				mainView.SendObject(obcm2);
+				dispose();
 			}
 		}
 	}

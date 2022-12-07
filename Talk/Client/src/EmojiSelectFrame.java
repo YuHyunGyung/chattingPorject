@@ -35,7 +35,7 @@ public class EmojiSelectFrame extends JFrame {
 			new ImageIcon("src/emoji/¿·.png"),
 	};
 	
-	EmojiSelectFrame(ChatClientMainView mainView, ChatClientChatRoomView chatroom) {
+	EmojiSelectFrame(ChatClientChatRoomView chatroom, ChatClientMainView mainView) {
 		this.mainView = mainView;
 		this.chatroom = chatroom;
 		setBounds(100, 300, 360, 321);
@@ -79,7 +79,7 @@ public class EmojiSelectFrame extends JFrame {
 				if(e.getSource() == Buttons[i]) {
 					ChatMsg obcm = new ChatMsg(chatroom.UserName, "300", "IMG");
 					ImageIcon img = ImageIcons[i];
-					obcm.img = img;
+					obcm.Image = img;
 					mainView.SendObject(obcm);
 					//setVisible(false);
 				}

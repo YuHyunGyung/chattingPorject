@@ -16,9 +16,12 @@ public class ChatClientSelectFriendDialog extends JDialog{
 	private static final long serialVersionUID = 1L;
 	
 	public Vector<FriendLabel> FriendLabel = new Vector<FriendLabel>();
+	private ChatClientMainView mainView;
+	public String roomId;
+	public String userlist;
 
 	public ChatClientSelectFriendDialog(ChatClientMainView mainView) {
-		
+		this.mainView = mainView;
 		
 		setBounds(100, 100, 240, 380);
 		getContentPane().setLayout(null);
@@ -26,14 +29,21 @@ public class ChatClientSelectFriendDialog extends JDialog{
 		JButton addChatRoom = new JButton("채팅방 추가");
 		addChatRoom.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				String roomId = "";
+				roomId = mainView.UserName;
+				userlist = mainView.UserName;
 				for(int i = 0; i <FriendLabel.size(); i++) {
-					if(FriendLabel.get(i).check)
-						roomId += FriendLabel.get(i).UserName + " ";
+					if(FriendLabel.get(i).check) { //선택됐으면 roomId에 포함 = userList
+						roomId += " " + FriendLabel.get(i).UserName;
+						userlist += " " + FriendLabel.get(i).UserName;
+					}
 				}
-				ChatMsg cm = new ChatMsg(mainView.UserName, "500", roomId);
+				System.out.println("Dialog roomId: " + roomId);
+				System.out.println("Dialog userlist: " + roomId);
+				
+				ChatMsg cm = new ChatMsg(mainView.UserName, "500", "New Room");
+				cm.roomId = roomId;
+				cm.userlist = userlist;
 				mainView.SendObject(cm);
-				System.out.println("Room ID : " + roomId);
 				dispose();
 				//mainView.AddChatRoom(cm);
 			}
@@ -48,20 +58,25 @@ public class ChatClientSelectFriendDialog extends JDialog{
 		getContentPane().add(scrollPane);
 		
 		JTextPane textPane = new JTextPane();
+		textPane.setEditable(false);
 		textPane.setLayout(null);
 		textPane.setBounds(0, 0, 227, 290);
 		scrollPane.setViewportView(textPane);
 		scrollPane.add(textPane);
 		//getContentPane().add(textPane);
 		
+		
+		//user profile 선택할 수 있도록 붙이기
 		for(int i = 0; i < mainView.FriendVector.size(); i++) {
-			int len = textPane.getDocument().getLength();
-			textPane.setCaretPosition(len);
-			FriendLabel f = new FriendLabel(mainView.FriendVector.get(i).UserImg, mainView.FriendVector.get(i).UserName);
-			FriendLabel.add(f);
-			textPane.insertComponent(f);
-			textPane.setCaretPosition(0);
-			repaint();
+			if(mainView.FriendVector.get(i).UserName != mainView.UserName) {
+				int len = textPane.getDocument().getLength();
+				textPane.setCaretPosition(len);
+				FriendLabel f = new FriendLabel(mainView, mainView.FriendVector.get(i).UserImg, mainView.FriendVector.get(i).UserName);
+				FriendLabel.add(f);
+				textPane.insertComponent(f);
+				textPane.setCaretPosition(0);
+				repaint();
+			}
 		}
 		
 	}

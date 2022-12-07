@@ -18,12 +18,12 @@ public class TextLeft extends JPanel{
 	public JLabel time;
 	public ImageIcon profileImg = new ImageIcon(FriendLabel.class.getResource("./img/standardProfile.png"));
 	
-	public TextLeft(ChatClientMainView mainView, String username, String chattime) {
+	public TextLeft(ChatClientMainView mainView, ImageIcon userImage, String username, String chattime) {
 		setPreferredSize(new Dimension(207, 63));
 		setBackground(new Color(147, 208, 250));
 		setLayout(null);
 		
-		profileImg = imageSetSize(profileImg, 56, 56);
+		profileImg = userImage; //imageSetSize(profileImg, 56, 56);
 		profile = new JButton(profileImg);
 		profile.setBounds(5, 5, 50, 50);
 		add(profile);
@@ -36,12 +36,5 @@ public class TextLeft extends JPanel{
 		time = new JLabel(chattime);
 		time.setBounds(60, 35, 120, 20);
 		add(time);
-	}
-	
-	public ImageIcon imageSetSize(ImageIcon icon, int i, int j) { // image Size Setting
-		Image ximg = icon.getImage();  //ImageIcon을 Image로 변환.
-		Image yimg = ximg.getScaledInstance(i, j, java.awt.Image.SCALE_SMOOTH);
-		ImageIcon xyimg = new ImageIcon(yimg); 
-		return xyimg;
 	}
 }

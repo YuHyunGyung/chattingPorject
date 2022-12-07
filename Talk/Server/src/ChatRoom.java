@@ -1,8 +1,10 @@
 import java.io.Serializable;
 
+import javax.swing.ImageIcon;
+
 public class ChatRoom implements Serializable {
 	private static final long serialVersionUID = 1L;
-	
+	public ImageIcon img;
 	public String roomId;
 	public String userList;
 	
